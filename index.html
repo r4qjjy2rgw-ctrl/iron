@@ -505,6 +505,58 @@
   .text-muted { color: var(--text-muted); }
   .font-cond { font-family: 'Barlow Condensed', sans-serif; }
 
+  /* SCHEDULE MODAL */
+  .schedule-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 6px; margin-bottom: 16px; }
+  .sched-day {
+    aspect-ratio: 1; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface2);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; gap: 2px; transition: all 0.15s;
+  }
+  .sched-day.on { border-color: var(--accent); background: var(--accent); }
+  .sched-day .sd-name { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
+  .sched-day.on .sd-name { color: #000; }
+  .sched-day .sd-wk { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800; color: var(--text-muted); }
+  .sched-day.on .sd-wk { color: #000; }
+  .workout-assign { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .assign-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px;
+  }
+  .assign-day-name { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 800; text-transform: uppercase; }
+  .assign-select {
+    background: var(--surface3); border: 1px solid var(--border);
+    color: var(--text); border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700;
+    padding: 6px 10px; cursor: pointer;
+  }
+
+  /* DATE NAV */
+  .date-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; margin-bottom: 4px;
+  }
+  .date-nav-arrow {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 18px; flex-shrink: 0;
+  }
+  .date-nav-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .date-nav-today {
+    font-size: 12px; color: var(--accent); font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    background: none; border: none; cursor: pointer; padding: 4px 8px;
+  }
+  .week-day { cursor: pointer; transition: border-color 0.15s; }
+  .week-day.selected:not(.today) { border-color: var(--text-dim); background: var(--surface2); }
+
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: translateY(0); }
@@ -522,10 +574,21 @@
         <div class="screen-title">IRON</div>
         <div class="screen-subtitle" id="home-date"></div>
       </div>
-      <div id="home-streak-badge" class="badge" style="margin-bottom:6px"></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div id="home-streak-badge" class="badge"></div>
+        <button onclick="openScheduleModal()" style="background:none;border:none;color:var(--text-muted);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Barlow Condensed',sans-serif;">⚙ Schedule</button>
+      </div>
     </div>
 
     <div style="margin-top:16px">
+      <!-- Date navigation -->
+      <div class="date-nav">
+        <button class="date-nav-arrow" onclick="shiftWeek(-1)">&#8249;</button>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+          <div class="date-nav-label" id="week-label"></div>
+        </div>
+        <button class="date-nav-arrow" onclick="shiftWeek(1)">&#8250;</button>
+      </div>
       <!-- Week strip -->
       <div class="week-strip" id="week-strip"></div>
 
@@ -677,6 +740,21 @@
   </div>
 </div>
 
+<!-- SCHEDULE MODAL -->
+<div class="modal-overlay" id="schedule-modal">
+  <div class="modal-sheet" style="max-height:90dvh">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Workout Schedule</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Tap days to toggle them on/off, then assign a workout to each.</div>
+    <div class="schedule-grid" id="sched-day-grid"></div>
+    <div class="section-label" style="margin-bottom:10px">Assign Workouts</div>
+    <div class="workout-assign" id="workout-assign-list"></div>
+    <button class="btn-primary" onclick="saveSchedule()">Save Schedule</button>
+    <div style="height:10px"></div>
+    <button class="btn-secondary" style="width:100%" onclick="closeScheduleModal()">Cancel</button>
+  </div>
+</div>
+
 <!-- HISTORY DETAIL MODAL -->
 <div class="modal-overlay" id="history-modal">
   <div class="modal-sheet">
@@ -718,12 +796,17 @@ const BEGINNER_PROGRAM = {
 };
 
 function loadData() {
-  return JSON.parse(localStorage.getItem('ironData') || 'null') || {
+  const defaults = {
     sessions: [],
     prs: {},
     bodyWeight: [],
-    lastWorkoutIndex: -1
+    lastWorkoutIndex: -1,
+    schedule: { 1: 'A', 3: 'B', 5: 'A' } // dow -> workout id
   };
+  const saved = JSON.parse(localStorage.getItem('ironData') || 'null');
+  if(!saved) return defaults;
+  if(!saved.schedule) saved.schedule = defaults.schedule;
+  return saved;
 }
 function saveData(d) { localStorage.setItem('ironData', JSON.stringify(d)); }
 
@@ -743,46 +826,146 @@ function switchScreen(id) {
 }
 
 // ════════════════════════════════════════════════
+// SCHEDULE
+// ════════════════════════════════════════════════
+let tempSchedule = {};
+
+function openScheduleModal() {
+  tempSchedule = JSON.parse(JSON.stringify(appData.schedule || {}));
+  renderScheduleModal();
+  document.getElementById('schedule-modal').classList.add('show');
+}
+
+function closeScheduleModal() {
+  document.getElementById('schedule-modal').classList.remove('show');
+}
+
+function renderScheduleModal() {
+  const dayNames = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const grid = document.getElementById('sched-day-grid');
+  grid.innerHTML = dayNames.map((name, i) => {
+    const on = tempSchedule[i] !== undefined;
+    return `<div class="sched-day ${on?'on':''}" onclick="toggleSchedDay(${i})">
+      <div class="sd-name">${name}</div>
+      <div class="sd-wk">${on ? (tempSchedule[i]||'A') : '–'}</div>
+    </div>`;
+  }).join('');
+
+  const assignList = document.getElementById('workout-assign-list');
+  const activeDays = Object.keys(tempSchedule).map(Number).sort();
+  if(!activeDays.length) {
+    assignList.innerHTML = `<div style="color:var(--text-muted);font-size:13px">Tap days above to add them.</div>`;
+    return;
+  }
+  const dayNamesLong = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  assignList.innerHTML = activeDays.map(dow => {
+    const opts = BEGINNER_PROGRAM.workouts.map(w =>
+      `<option value="${w.id}" ${tempSchedule[dow]===w.id?'selected':''}>${w.name}</option>`
+    ).join('');
+    return `<div class="assign-row">
+      <div class="assign-day-name">${dayNamesLong[dow]}</div>
+      <select class="assign-select" onchange="assignWorkout(${dow}, this.value)">${opts}</select>
+    </div>`;
+  }).join('');
+}
+
+function toggleSchedDay(dow) {
+  if(tempSchedule[dow] !== undefined) {
+    delete tempSchedule[dow];
+  } else {
+    // auto-assign next workout in sequence
+    const assigned = Object.values(tempSchedule);
+    const lastIdx = assigned.length ? BEGINNER_PROGRAM.workouts.findIndex(w=>w.id===assigned[assigned.length-1]) : -1;
+    const nextIdx = (lastIdx + 1) % BEGINNER_PROGRAM.workouts.length;
+    tempSchedule[dow] = BEGINNER_PROGRAM.workouts[nextIdx].id;
+  }
+  renderScheduleModal();
+}
+
+function assignWorkout(dow, workoutId) {
+  tempSchedule[dow] = workoutId;
+}
+
+function saveSchedule() {
+  appData.schedule = tempSchedule;
+  saveData(appData);
+  closeScheduleModal();
+  renderHome();
+}
+
+// ════════════════════════════════════════════════
 // HOME
 // ════════════════════════════════════════════════
+const realToday = new Date();
+realToday.setHours(0,0,0,0);
+let viewDate = new Date(realToday); // currently viewed date
+
+function shiftWeek(dir) {
+  viewDate.setDate(viewDate.getDate() + dir * 7);
+  renderHome();
+}
+
+function selectDay(dateStr) {
+  viewDate = new Date(dateStr + 'T12:00:00');
+  renderHome();
+}
+
+function goToday() {
+  viewDate = new Date(realToday);
+  renderHome();
+}
+
 function renderHome() {
-  const now = new Date();
+  const now = viewDate;
+  const isViewingToday = now.toISOString().slice(0,10) === realToday.toISOString().slice(0,10);
+
   document.getElementById('home-date').textContent =
-    now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+    now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}) +
+    (isViewingToday ? '' : '');
+
+  // Week label
+  const dow = now.getDay();
+  const weekStart = new Date(now); weekStart.setDate(now.getDate() - dow);
+  const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6);
+  const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  document.getElementById('week-label').innerHTML =
+    `${fmt(weekStart)} – ${fmt(weekEnd)}` +
+    (!isViewingToday ? ` <button class="date-nav-today" onclick="goToday()">Today</button>` : '');
 
   // Week strip
   const strip = document.getElementById('week-strip');
   strip.innerHTML = '';
   const dayNames = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-  const today = now.getDay();
-  const todayDate = now.getDate();
+  const viewDateStr = now.toISOString().slice(0,10);
 
   for(let i=0;i<7;i++){
-    const d = new Date(now); d.setDate(todayDate - today + i);
+    const d = new Date(weekStart); d.setDate(weekStart.getDate() + i);
     const dateStr = d.toISOString().slice(0,10);
     const hasSession = appData.sessions.some(s => s.date === dateStr);
-    const isToday = i === today;
+    const isToday = dateStr === realToday.toISOString().slice(0,10);
+    const isSelected = dateStr === viewDateStr;
     const el = document.createElement('div');
-    el.className = 'week-day' + (isToday?' today':'') + (hasSession?' completed':'');
+    el.className = 'week-day' +
+      (isToday ? ' today' : '') +
+      (hasSession ? ' completed' : '') +
+      (isSelected && !isToday ? ' selected' : '');
     el.innerHTML = `<div class="wd-name">${dayNames[i]}</div><div class="wd-num">${d.getDate()}</div><div class="wd-dot"></div>`;
+    el.onclick = () => selectDay(dateStr);
     strip.appendChild(el);
   }
 
-  // Stats
+  // Stats (always based on real today)
   const totalSessions = appData.sessions.length;
-  // this week sessions
-  const weekStart = new Date(now); weekStart.setDate(todayDate - today); weekStart.setHours(0,0,0,0);
-  const weekSessions = appData.sessions.filter(s => new Date(s.date) >= weekStart).length;
+  const realWeekStart = new Date(realToday); realWeekStart.setDate(realToday.getDate() - realToday.getDay()); realWeekStart.setHours(0,0,0,0);
+  const weekSessions = appData.sessions.filter(s => new Date(s.date+'T12:00:00') >= realWeekStart).length;
 
-  // streak (consecutive weeks with ≥3 sessions)
   let streak = 0;
-  // simple: count consecutive weeks back
-  let checkWeek = new Date(weekStart);
+  let checkWeek = new Date(realWeekStart);
   while(true) {
     const ws = new Date(checkWeek);
     const we = new Date(checkWeek); we.setDate(we.getDate()+7);
-    const count = appData.sessions.filter(s => { const d=new Date(s.date); return d>=ws && d<we; }).length;
-    if(count>=3 || (ws.getTime()===weekStart.getTime() && weekSessions>0)) { streak++; checkWeek.setDate(checkWeek.getDate()-7); }
+    const count = appData.sessions.filter(s => { const d=new Date(s.date+'T12:00:00'); return d>=ws && d<we; }).length;
+    if(count>=3 || (ws.getTime()===realWeekStart.getTime() && weekSessions>0)) { streak++; checkWeek.setDate(checkWeek.getDate()-7); }
     else break;
     if(streak>52) break;
   }
@@ -791,17 +974,46 @@ function renderHome() {
   document.getElementById('stat-streak').textContent = streak;
   document.getElementById('stat-total').textContent = totalSessions;
   document.getElementById('stat-week').textContent = weekSessions+'/3';
-  document.getElementById('home-streak-badge').textContent = streak + (streak===1?' WEEK STREAK':' WEEK STREAK');
+  document.getElementById('home-streak-badge').textContent = streak + ' WEEK STREAK';
 
-  // Determine today's workout
-  const todayDow = now.getDay(); // 0=Sun
-  const isWorkoutDay = BEGINNER_PROGRAM.schedule.includes(todayDow);
-  const nextWorkout = getNextWorkout();
+  // Workout card for viewed date
+  const viewDow = now.getDay();
+  const isWorkoutDay = appData.schedule && appData.schedule[viewDow] !== undefined;
+  // Get workout for this specific day from schedule, or fall back to sequence
+  const scheduledWorkoutId = appData.schedule && appData.schedule[viewDow];
+  const scheduledWorkout = scheduledWorkoutId
+    ? BEGINNER_PROGRAM.workouts.find(w=>w.id===scheduledWorkoutId) || getNextWorkout()
+    : getNextWorkout();
+  const nextWorkout = scheduledWorkout;
+
+  // Check if there's a logged session on this date
+  const existingSession = appData.sessions.find(s => s.date === viewDateStr);
 
   const cardWrap = document.getElementById('today-card-wrap');
   const btnWrap = document.getElementById('start-btn-wrap');
 
-  if(!isWorkoutDay) {
+  if(existingSession) {
+    // Show completed session summary
+    const setCount = existingSession.exercises ? existingSession.exercises.reduce((a,e)=>a+e.sets.filter(st=>st.logged).length,0) : 0;
+    const exRows = (existingSession.exercises||[]).map(ex => {
+      const logged = ex.sets.filter(s=>s.logged);
+      const best = logged.reduce((a,s)=>s.weight>a?s.weight:a,0);
+      return `<div class="exercise-preview">
+        <div class="exercise-preview-dot" style="background:var(--green)"></div>
+        <div class="exercise-preview-name">${ex.name}</div>
+        <div class="exercise-preview-sets">${logged.length} sets · top ${best}lb</div>
+      </div>`;
+    }).join('');
+    cardWrap.innerHTML = `
+      <div class="today-card">
+        <div class="today-card-header" style="background:var(--green)">
+          <div><div class="day-label">Completed</div><div class="workout-name">${existingSession.workoutName}</div></div>
+          <div style="font-size:28px">✅</div>
+        </div>
+        <div class="today-card-body">${exRows}</div>
+      </div>`;
+    btnWrap.innerHTML = `<p style="text-align:center;color:var(--text-muted);font-size:13px;padding:8px 0">${setCount} sets · ${existingSession.durationMin||0} min · ${existingSession.volume||0} lbs lifted</p>`;
+  } else if(!isWorkoutDay) {
     cardWrap.innerHTML = `
       <div class="rest-card">
         <div class="rest-icon">🛌</div>
@@ -819,16 +1031,21 @@ function renderHome() {
       </div>`;
     }).join('');
 
+    const isPast = now < realToday;
+    const isFuture = now > realToday;
+
     cardWrap.innerHTML = `
       <div class="today-card">
         <div class="today-card-header">
-          <div><div class="day-label">Today's Session</div><div class="workout-name">${nextWorkout.name}</div></div>
-          <div style="font-size:28px">🏋️</div>
+          <div><div class="day-label">${isPast ? 'Missed Session' : isFuture ? 'Upcoming Session' : "Today's Session"}</div><div class="workout-name">${nextWorkout.name}</div></div>
+          <div style="font-size:28px">${isPast ? '⚠️' : isFuture ? '📅' : '🏋️'}</div>
         </div>
         <div class="today-card-body">${exPreviews}</div>
       </div>`;
 
-    btnWrap.innerHTML = `<button class="btn-primary mt12" onclick="startWorkout()">Start Session →</button>`;
+    btnWrap.innerHTML = isViewingToday
+      ? `<button class="btn-primary mt12" onclick="startWorkout()">Start Session →</button>`
+      : `<p style="text-align:center;color:var(--text-muted);font-size:13px;padding:8px 0">${isPast ? 'Session not logged' : 'Scheduled workout'}</p>`;
   }
 }
 

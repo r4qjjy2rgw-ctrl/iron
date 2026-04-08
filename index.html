@@ -493,6 +493,49 @@
   .pr-flash-text { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 800; color: var(--accent); text-transform: uppercase; }
   .pr-flash-sub { font-size: 12px; color: var(--text-muted); }
 
+  /* RECOMMENDATION BOX */
+  .rec-box {
+    background: var(--accent-dim2);
+    border: 1px solid rgba(232,255,74,0.25);
+    border-radius: 10px; padding: 12px 14px;
+    margin: 10px 0 4px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .rec-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 700; }
+  .rec-weight { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .rec-delta { font-size: 12px; color: var(--accent); opacity: 0.7; }
+  .rec-apply {
+    background: var(--accent); color: #000;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;
+    border: none; border-radius: 8px; padding: 10px 14px; cursor: pointer; flex-shrink: 0;
+  }
+
+  /* PLATE CALCULATOR */
+  .plate-calc-wrap {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; margin-top: 8px;
+  }
+  .plate-calc-header {
+    display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+  }
+  .plate-calc-title { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+  .plate-calc-body { margin-top: 10px; }
+  .plate-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+  .plate-chip {
+    background: var(--surface3); border: 1px solid var(--border);
+    border-radius: 6px; padding: 4px 10px;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800;
+    color: var(--text);
+  }
+  .plate-chip.p45 { border-color: #888; color: #ccc; }
+  .plate-chip.p35 { border-color: #6af; color: #6af; }
+  .plate-chip.p25 { border-color: #fa0; color: #fa0; }
+  .plate-chip.p10 { border-color: #4f4; color: #4f4; }
+  .plate-chip.p5  { border-color: #f64; color: #f64; }
+  .plate-chip.p2  { border-color: #a8f; color: #a8f; }
+  .plate-note { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
   /* SWAP OPTIONS */
   .swap-option {
     background: var(--surface2); border: 1px solid var(--border);
@@ -1185,6 +1228,105 @@ function getPrevPerformance(varId) {
 }
 
 // ════════════════════════════════════════════════
+// WEIGHT RECOMMENDATION
+// ════════════════════════════════════════════════
+
+// Accessory lifts — carry forward same weight, no auto-increment
+const ACCESSORY_IDS = new Set(['curl','barcurl','hamcurl','tric','skullcrusher','dbtric']);
+
+function getPrevFullSession(varId) {
+  // Return the full exercise record from the last session that logged this variation
+  for(let i=appData.sessions.length-1;i>=0;i--){
+    const s = appData.sessions[i];
+    const ex = s.exercises && s.exercises.find(e=>e.actualId===varId || (!e.actualId && e.id===varId));
+    if(ex && ex.sets && ex.sets.filter(st=>st.logged).length>0) return ex;
+  }
+  return null;
+}
+
+function getRecommendedWeight(ex) {
+  const varId = ex.actualId || ex.id;
+  const primaryId = ex.primaryId || ex.id;
+  const prevEx = getPrevFullSession(varId);
+  if(!prevEx) return null; // no history
+
+  const loggedSets = prevEx.sets.filter(s=>s.logged);
+  if(!loggedSets.length) return null;
+
+  // For accessories, just carry forward — no increment
+  if(ACCESSORY_IDS.has(primaryId)) {
+    return { weight: loggedSets[loggedSets.length-1].weight, delta: 0, reason: 'Same as last session' };
+  }
+
+  // Check if all sets hit the target reps
+  const targetReps = ex.reps;
+  const allComplete = loggedSets.every(s => s.reps >= targetReps);
+  const increment = primaryId === 'dl' ? 10 : 5;
+
+  const lastWeight = loggedSets[loggedSets.length-1].weight;
+
+  if(allComplete) {
+    return { weight: lastWeight + increment, delta: +increment, reason: `Hit all reps last time — add ${increment}lb` };
+  } else {
+    return { weight: lastWeight, delta: 0, reason: 'Missed reps last session — repeat weight' };
+  }
+}
+
+// ── PLATE CALCULATOR ──────────────────────────────────────────────────────────
+const BAR_WEIGHT = 45;
+const PLATE_SIZES = [45, 35, 25, 10, 5, 2.5];
+const PLATE_CLASSES = {45:'p45',35:'p35',25:'p25',10:'p10',5:'p5',2.5:'p2'};
+
+function calcPlates(totalWeight) {
+  // Returns array of plate weights needed per side
+  let remaining = (totalWeight - BAR_WEIGHT) / 2;
+  if(remaining < 0) return null; // below bar weight
+  const plates = [];
+  for(const p of PLATE_SIZES) {
+    while(remaining >= p - 0.01) {
+      plates.push(p);
+      remaining -= p;
+      remaining = Math.round(remaining * 100) / 100;
+    }
+  }
+  return plates;
+}
+
+function renderPlateCalc(weight, containerId) {
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  if(weight <= 0) { el.innerHTML = ''; return; }
+
+  // Only show for barbell exercises (not dumbbell/machine/legpress)
+  const ex = activeWorkout.exercises[activeExIdx];
+  const varId = ex.actualId || ex.id;
+  const dbMachineIds = new Set(['legpress','goblet','hacksquat','dbbench','machpress','cablerow','machrow','dbohp','machohp','curl','barcurl','hamcurl','tric','skullcrusher','dbtric','rdl']);
+  if(dbMachineIds.has(varId)) { el.innerHTML = ''; return; }
+
+  const plates = calcPlates(weight);
+  if(!plates) { el.innerHTML = `<div class="plate-note">Below bar weight (${BAR_WEIGHT}lb)</div>`; return; }
+
+  const chips = plates.map(p =>
+    `<div class="plate-chip ${PLATE_CLASSES[p]||''}">${p}</div>`
+  ).join('');
+
+  const totalCheck = BAR_WEIGHT + plates.reduce((a,p)=>a+p,0)*2;
+
+  el.innerHTML = `
+    <div class="plate-calc-wrap">
+      <div class="plate-calc-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        <div class="plate-calc-title">🏋️ Plate Setup · ${weight}lb total</div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+      </div>
+      <div class="plate-calc-body">
+        <div class="plate-note" style="margin-bottom:6px">Each side of bar:</div>
+        <div class="plate-row">${chips || '<div class="plate-note">Just the bar</div>'}</div>
+        <div class="plate-note">Bar (${BAR_WEIGHT}lb) + ${plates.reduce((a,p)=>a+p,0)*2}lb plates = ${totalCheck}lb total</div>
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════
 // ACTIVE WORKOUT
 // ════════════════════════════════════════════════
 let activeWorkout = null;
@@ -1281,6 +1423,17 @@ function renderActiveWorkout() {
   const isSwapped = ex.actualId && ex.actualId !== ex.primaryId;
   const prevForActual = getPrevPerformance(ex.actualId || ex.id);
   const displayNotes = ex.actualNotes || ex.notes;
+  const rec = getRecommendedWeight(ex);
+
+  const recHtml = rec ? `
+    <div class="rec-box">
+      <div>
+        <div class="rec-label">Recommended</div>
+        <div class="rec-weight">${rec.weight} <span style="font-size:14px;font-weight:600">lbs</span></div>
+        <div class="rec-delta">${rec.delta > 0 ? '+'+rec.delta+'lb · ' : rec.delta < 0 ? rec.delta+'lb · ' : ''}${rec.reason}</div>
+      </div>
+      <button class="rec-apply" onclick="applyRecommendation(${rec.weight})">Apply</button>
+    </div>` : '';
 
   area.innerHTML = `
     <div class="exercise-title-row" style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
@@ -1292,15 +1445,21 @@ function renderActiveWorkout() {
     </div>
     <div class="prev-session-box">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-      <div>
+      <div style="flex:1">
         <div class="prev-label">Last session${isSwapped ? ' ('+displayName+')' : ''}</div>
         <div class="prev-val">${prevForActual ? prevForActual.weight+'lb × '+prevForActual.reps+' reps' : 'No previous data — start light!'}</div>
       </div>
     </div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;font-style:italic">${displayNotes}</div>
+    ${recHtml}
+    <div id="plate-calc-area"></div>
+    <div style="font-size:12px;color:var(--text-muted);margin:4px 0;font-style:italic">${displayNotes}</div>
     <div class="sets-list">${setsHtml}</div>
     <button class="add-set-btn" onclick="addSet()">+ Add Set</button>
   `;
+
+  // Render plate calc for current working weight
+  const workingWeight = ex.sets.find(s=>!s.logged)?.weight || ex.sets[ex.sets.length-1]?.weight || rec?.weight || 0;
+  renderPlateCalc(workingWeight, 'plate-calc-area');
 }
 
 function openSwapModal(exIdx) {
@@ -1349,6 +1508,12 @@ function closeSwapModal() {
   document.getElementById('swap-modal').classList.remove('show');
 }
 
+function applyRecommendation(weight) {
+  const ex = activeWorkout.exercises[activeExIdx];
+  ex.sets.forEach(s => { if(!s.logged) s.weight = weight; });
+  renderActiveWorkout();
+}
+
 function switchExercise(idx) {
   activeExIdx = idx;
   renderActiveWorkout();
@@ -1357,6 +1522,9 @@ function switchExercise(idx) {
 
 function updateSetVal(si, field, val) {
   activeWorkout.exercises[activeExIdx].sets[si][field] = parseFloat(val)||0;
+  if(field === 'weight') {
+    renderPlateCalc(parseFloat(val)||0, 'plate-calc-area');
+  }
 }
 
 function logSet(si) {

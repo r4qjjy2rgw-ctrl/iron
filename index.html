@@ -493,6 +493,29 @@
   .pr-flash-text { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 800; color: var(--accent); text-transform: uppercase; }
   .pr-flash-sub { font-size: 12px; color: var(--text-muted); }
 
+  /* SWAP OPTIONS */
+  .swap-option {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px;
+    cursor: pointer; transition: border-color 0.15s;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .swap-option.selected { border-color: var(--accent); background: var(--accent-dim2); }
+  .swap-option-info { flex: 1; }
+  .swap-option-name { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; text-transform: uppercase; }
+  .swap-option-prev { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .swap-option-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; display:flex; align-items:center; justify-content:center; }
+  .swap-option.selected .swap-option-check { background: var(--accent); border-color: var(--accent); }
+  .swap-btn {
+    background: none; border: none;
+    color: var(--text-muted); font-size: 11px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; padding: 4px 6px;
+    border: 1px solid var(--border); border-radius: 6px;
+    white-space: nowrap;
+  }
+
   /* Scroll */
   .scroll-area { overflow-y: auto; flex: 1; }
 
@@ -755,6 +778,17 @@
   </div>
 </div>
 
+<!-- SWAP EXERCISE MODAL -->
+<div class="modal-overlay" id="swap-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="swap-modal-title">Swap Exercise</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Choose a substitute for this slot. Previous performance shown for each.</div>
+    <div id="swap-options-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+    <button class="btn-secondary" style="width:100%" onclick="closeSwapModal()">Cancel</button>
+  </div>
+</div>
+
 <!-- HISTORY DETAIL MODAL -->
 <div class="modal-overlay" id="history-modal">
   <div class="modal-sheet">
@@ -781,6 +815,7 @@ const BEGINNER_PROGRAM = {
         { id:"squat",  name:"Back Squat",       sets:3, reps:5, muscle:"Legs",  notes:"Drive knees out, chest up" },
         { id:"bench",  name:"Bench Press",       sets:3, reps:5, muscle:"Chest", notes:"Touch chest, full lockout" },
         { id:"row",    name:"Dumbbell Row",       sets:3, reps:8, muscle:"Back",  notes:"Brace on bench, pull elbow to hip — each side" },
+        { id:"curl",   name:"Dumbbell Curl",       sets:3, reps:10, muscle:"Biceps", notes:"Full range, no swinging — slow on the way down" },
       ]
     },
     {
@@ -790,10 +825,65 @@ const BEGINNER_PROGRAM = {
         { id:"squat",  name:"Back Squat",       sets:3, reps:5, muscle:"Legs",  notes:"Same as A — squat every session" },
         { id:"ohp",    name:"Overhead Press",    sets:3, reps:5, muscle:"Shoulders", notes:"Bar path straight up, squeeze glutes" },
         { id:"dl",     name:"Deadlift",          sets:1, reps:5, muscle:"Back/Legs", notes:"Single working set — it's enough" },
+        { id:"tric",   name:"Tricep Pushdown",     sets:3, reps:12, muscle:"Triceps", notes:"Cable or band — elbows pinned to sides, full extension" },
       ]
     }
   ]
 };
+
+// Exercise substitutes — keyed by primary exercise id
+const SUBSTITUTES = {
+  squat: [
+    { id:"squat",    name:"Back Squat",         notes:"Drive knees out, chest up" },
+    { id:"legpress", name:"Leg Press",           notes:"Feet shoulder-width, full range — don't lock knees" },
+    { id:"goblet",   name:"Goblet Squat",        notes:"Dumbbell at chest, elbows inside knees" },
+    { id:"hacksquat",name:"Hack Squat",          notes:"Machine — same depth cues as barbell squat" },
+  ],
+  bench: [
+    { id:"bench",    name:"Bench Press",         notes:"Touch chest, full lockout" },
+    { id:"dbbench",  name:"Dumbbell Press",      notes:"Neutral or pronated grip, controlled descent" },
+    { id:"machpress",name:"Machine Chest Press", notes:"Set seat so handles align with mid-chest" },
+  ],
+  row: [
+    { id:"row",      name:"Dumbbell Row",        notes:"Brace on bench, pull elbow to hip — each side" },
+    { id:"cablerow", name:"Cable Row",           notes:"Neutral grip, pull to lower chest, squeeze" },
+    { id:"machrow",  name:"Machine Row",         notes:"Chest pad, pull handles to sides" },
+  ],
+  ohp: [
+    { id:"ohp",      name:"Overhead Press",      notes:"Bar path straight up, squeeze glutes" },
+    { id:"dbohp",    name:"DB Shoulder Press",   notes:"Dumbbells at ear level, press straight up" },
+    { id:"machohp",  name:"Machine Shoulder Press", notes:"Adjust seat so handles are at shoulder height" },
+  ],
+  dl: [
+    { id:"dl",       name:"Deadlift",            notes:"Single working set — it's enough" },
+    { id:"rdl",      name:"Romanian Deadlift",   notes:"Soft knee, hinge at hips, bar stays close" },
+    { id:"trapbar",  name:"Trap Bar Deadlift",   notes:"Neutral grip, stand tall at top" },
+  ],
+  curl: [
+    { id:"curl",     name:"Dumbbell Curl",       notes:"Full range, no swinging — slow on the way down" },
+    { id:"barcurl",  name:"Barbell Curl",        notes:"Elbows pinned to sides, squeeze at top" },
+    { id:"hamcurl",  name:"Hammer Curl",         notes:"Neutral grip, great for brachialis" },
+  ],
+  tric: [
+    { id:"tric",     name:"Tricep Pushdown",     notes:"Cable or band — elbows pinned to sides, full extension" },
+    { id:"skullcrusher",name:"Skull Crusher",    notes:"Bar to forehead, elbows straight up" },
+    { id:"dbtric",   name:"DB Tricep Extension", notes:"One dumbbell overhead, lower behind head" },
+  ],
+};
+
+// Get the canonical/primary id for any variation id
+function getPrimaryId(varId) {
+  for(const [primary, subs] of Object.entries(SUBSTITUTES)) {
+    if(subs.some(s=>s.id===varId)) return primary;
+  }
+  return varId;
+}
+
+// Get sub definition by id
+function getSubDef(primaryId, varId) {
+  const subs = SUBSTITUTES[primaryId] || [];
+  return subs.find(s=>s.id===varId) || subs[0];
+}
 
 function loadData() {
   const defaults = {
@@ -1067,10 +1157,11 @@ function getNextWorkoutDayName() {
   }
 }
 
-function getPrevPerformance(exId) {
+function getPrevPerformance(varId) {
+  // Match by exact variation id (e.g. legpress, not squat)
   for(let i=appData.sessions.length-1;i>=0;i--){
     const s = appData.sessions[i];
-    const ex = s.exercises && s.exercises.find(e=>e.id===exId);
+    const ex = s.exercises && s.exercises.find(e=>e.actualId===varId || (!e.actualId && e.id===varId));
     if(ex && ex.sets && ex.sets.length>0){
       const logged = ex.sets.filter(st=>st.logged);
       if(logged.length>0) return logged[logged.length-1];
@@ -1097,6 +1188,9 @@ function startWorkout() {
     name: wk.name,
     exercises: wk.exercises.map(ex => ({
       ...ex,
+      primaryId: ex.id,   // original slot id e.g. "squat"
+      actualId: ex.id,    // what was actually performed (may be swapped)
+      actualName: ex.name,
       sets: Array.from({length: ex.sets}, (_, i) => ({
         setNum: i+1,
         reps: ex.reps,
@@ -1169,22 +1263,76 @@ function renderActiveWorkout() {
     </div>`;
   }).join('');
 
+  const displayName = ex.actualName || ex.name;
+  const isSwapped = ex.actualId && ex.actualId !== ex.primaryId;
+  const prevForActual = getPrevPerformance(ex.actualId || ex.id);
+  const displayNotes = ex.actualNotes || ex.notes;
+
   area.innerHTML = `
-    <div class="exercise-title-row">
-      <div class="exercise-title">${ex.name}</div>
-      <div class="exercise-meta">${ex.sets.length} sets × ${ex.reps} reps · ${ex.muscle}</div>
+    <div class="exercise-title-row" style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+      <div>
+        <div class="exercise-title">${displayName}</div>
+        <div class="exercise-meta">${ex.sets.length} sets × ${ex.reps} reps · ${ex.muscle}${isSwapped ? ' · <span style=\'color:var(--accent)\'>subbed</span>' : ''}</div>
+      </div>
+      <button class="swap-btn" onclick="openSwapModal(${activeExIdx})" style="margin-top:4px;flex-shrink:0">⇄ Swap</button>
     </div>
     <div class="prev-session-box">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
       <div>
-        <div class="prev-label">Last session</div>
-        <div class="prev-val">${prev ? prev.weight+'lb × '+prev.reps+' reps' : 'No previous data — start light!'}</div>
+        <div class="prev-label">Last session${isSwapped ? ' ('+displayName+')' : ''}</div>
+        <div class="prev-val">${prevForActual ? prevForActual.weight+'lb × '+prevForActual.reps+' reps' : 'No previous data — start light!'}</div>
       </div>
     </div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;font-style:italic">${ex.notes}</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;font-style:italic">${displayNotes}</div>
     <div class="sets-list">${setsHtml}</div>
     <button class="add-set-btn" onclick="addSet()">+ Add Set</button>
   `;
+}
+
+function openSwapModal(exIdx) {
+  const ex = activeWorkout.exercises[exIdx];
+  const primaryId = ex.primaryId || ex.id;
+  const subs = SUBSTITUTES[primaryId] || [];
+  document.getElementById('swap-modal-title').textContent = 'Swap: ' + (ex.name || ex.actualName);
+
+  const list = document.getElementById('swap-options-list');
+  list.innerHTML = subs.map(sub => {
+    const prev = getPrevPerformance(sub.id);
+    const isCurrent = (ex.actualId || ex.id) === sub.id;
+    return `<div class="swap-option ${isCurrent?'selected':''}" onclick="selectSwap(${exIdx},'${sub.id}')">
+      <div class="swap-option-info">
+        <div class="swap-option-name">${sub.name}</div>
+        <div class="swap-option-prev">${prev ? 'Last: '+prev.weight+'lb × '+prev.reps+' reps' : 'No history yet'}</div>
+      </div>
+      <div class="swap-option-check">
+        ${isCurrent ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><polyline points="20,6 9,17 4,12"/></svg>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('swap-modal').classList.add('show');
+}
+
+function selectSwap(exIdx, subId) {
+  const ex = activeWorkout.exercises[exIdx];
+  const primaryId = ex.primaryId || ex.id;
+  const subDef = getSubDef(primaryId, subId);
+  if(!subDef) return;
+
+  ex.actualId = subId;
+  ex.actualName = subDef.name;
+  ex.actualNotes = subDef.notes;
+
+  // Update set weights to match previous performance for this variation
+  const prev = getPrevPerformance(subId);
+  ex.sets.forEach(s => { if(!s.logged) s.weight = prev?.weight || 0; });
+
+  closeSwapModal();
+  renderActiveWorkout();
+}
+
+function closeSwapModal() {
+  document.getElementById('swap-modal').classList.remove('show');
 }
 
 function switchExercise(idx) {
@@ -1291,20 +1439,22 @@ function closeFinishModal() {
 
 function finishWorkout() {
   // Save session
+  const durationMin = Math.max(1, Math.floor((Date.now()-workoutStartTime)/1000/60));
   const session = {
     date: new Date().toISOString().slice(0,10),
     workoutId: activeWorkout.id,
     workoutName: activeWorkout.name,
-    durationMin: Math.floor((Date.now()-workoutStartTime)/1000/60),
+    durationMin: durationMin,
     exercises: activeWorkout.exercises,
     volume: 0
   };
   let vol = 0;
   activeWorkout.exercises.forEach(ex => {
     ex.sets.filter(s=>s.logged).forEach(s=>{ vol += (s.weight||0)*s.reps; });
-    // Update PRs
+    // Update PRs keyed by actualId (variation performed)
+    const prKey = ex.actualId || ex.id;
     ex.sets.filter(s=>s.logged).forEach(s=>{
-      if(s.weight > (appData.prs[ex.id]||0)) appData.prs[ex.id] = s.weight;
+      if(s.weight > (appData.prs[prKey]||0)) appData.prs[prKey] = s.weight;
     });
   });
   session.volume = vol;
@@ -1361,7 +1511,7 @@ function showHistoryDetail(idx) {
       <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700">${st.weight}lb × ${st.reps}</span>
     </div>`).join('');
     return `<div style="margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;text-transform:uppercase;margin-bottom:4px">${ex.name}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;text-transform:uppercase;margin-bottom:4px">${ex.actualName||ex.name}${ex.actualId&&ex.actualId!==ex.primaryId?' <span style=\'font-size:12px;color:var(--accent);font-weight:600;text-transform:none\'>subbed</span>':''}</div>
       ${setRows}
     </div>`;
   }).join('');
@@ -1384,8 +1534,8 @@ function closeHistoryModal() {
 function renderProgress() {
   // PRs
   const prGrid = document.getElementById('pr-grid');
-  const prExercises = ['squat','bench','ohp','dl','row'];
-  const prNames = {squat:'Back Squat',bench:'Bench Press',ohp:'Overhead Press',dl:'Deadlift',row:'Dumbbell Row'};
+  const prExercises = ['squat','bench','ohp','dl','row','curl','tric'];
+  const prNames = {squat:'Back Squat',bench:'Bench Press',ohp:'Overhead Press',dl:'Deadlift',row:'Dumbbell Row',curl:'Dumbbell Curl',tric:'Tricep Pushdown'};
   prGrid.innerHTML = prExercises.map(id => {
     const val = appData.prs[id]||0;
     return `<div class="pr-card">

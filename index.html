@@ -674,6 +674,20 @@
           <div class="chart-bars" id="vol-chart-bars"></div>
         </div>
       </div>
+      <div class="weight-log-section" style="padding-bottom:0">
+        <div class="section-label" style="margin-bottom:10px">Data Backup</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button onclick="exportData()" style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--accent);border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;padding:13px;cursor:pointer;">
+            ↓ Export
+          </button>
+          <label style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;padding:13px;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center;">
+            ↑ Import
+            <input type="file" accept=".json" onchange="importData(event)" style="display:none">
+          </label>
+        </div>
+        <div id="backup-status" style="font-size:12px;color:var(--text-muted);text-align:center;min-height:18px;margin-bottom:12px"></div>
+      </div>
+
       <div class="weight-log-section">
         <div class="section-label" style="margin-bottom:10px">Body Weight</div>
         <div class="weight-input-row">
@@ -1572,6 +1586,47 @@ function logBodyWeight() {
   saveData(appData);
   document.getElementById('weight-input').value = '';
   renderWeightHistory();
+}
+
+function exportData() {
+  const data = JSON.stringify(appData, null, 2);
+  const date = new Date().toISOString().slice(0,10);
+  const blob = new Blob([data], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `iron-backup-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  const status = document.getElementById('backup-status');
+  if(status) { status.textContent = `✓ Exported iron-backup-${date}.json`; status.style.color = 'var(--green)'; }
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      // Validate it looks like iron data
+      if(!imported.sessions || !imported.prs) throw new Error('Invalid backup file');
+      appData = imported;
+      if(!appData.schedule) appData.schedule = {1:'A',3:'B',5:'A'};
+      saveData(appData);
+      const status = document.getElementById('backup-status');
+      if(status) {
+        status.textContent = `✓ Restored ${imported.sessions.length} sessions`;
+        status.style.color = 'var(--green)';
+      }
+      renderProgress();
+    } catch(err) {
+      const status = document.getElementById('backup-status');
+      if(status) { status.textContent = '✗ Invalid backup file'; status.style.color = 'var(--red)'; }
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
 }
 
 function renderWeightHistory() {

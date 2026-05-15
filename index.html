@@ -571,6 +571,119 @@
   .text-muted { color: var(--text-muted); }
   .font-cond { font-family: 'Barlow Condensed', sans-serif; }
 
+  /* EXERCISE PICKER */
+  .picker-search {
+    background: var(--surface3); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px;
+    font-size: 15px; padding: 12px 14px; width: 100%;
+    margin-bottom: 12px; -webkit-appearance: none;
+  }
+  .picker-search:focus { outline: none; border-color: var(--accent); }
+  .picker-cat-header {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--accent);
+    margin: 14px 0 8px; padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .picker-option {
+    padding: 12px 14px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 10px;
+    margin-bottom: 6px; cursor: pointer;
+  }
+  .picker-option:active { background: var(--surface3); }
+  .picker-opt-name { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800; text-transform: uppercase; }
+  .picker-opt-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ANALYSIS BOX */
+  .analysis-box {
+    border-radius: 10px; padding: 10px 12px;
+    margin-bottom: 12px; font-size: 13px;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .analysis-box.good { background: rgba(74,255,140,0.08); border: 1px solid rgba(74,255,140,0.25); color: var(--green); }
+  .analysis-box.warn { background: rgba(255,165,0,0.08); border: 1px solid rgba(255,165,0,0.25); color: #ffa500; }
+  .analysis-box.info { background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); }
+  .analysis-box.error { background: rgba(255,74,74,0.08); border: 1px solid rgba(255,74,74,0.25); color: var(--red); }
+  .analysis-icon { font-size: 14px; flex-shrink: 0; line-height: 1.3; }
+
+  /* TEMPLATE EDITOR */
+  .tpl-tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .tpl-tab {
+    padding: 8px 14px; border-radius: 20px;
+    background: var(--surface2); border: 1px solid var(--border);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+    color: var(--text-muted); cursor: pointer;
+  }
+  .tpl-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+  .tpl-tab-add { color: var(--accent); border-style: dashed; background: none; }
+
+  .tpl-name-input {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800;
+    padding: 10px 12px; width: 100%; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .tpl-exercise {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; margin-bottom: 8px;
+  }
+  .tpl-ex-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  }
+  .tpl-ex-name-input {
+    flex: 1;
+    background: var(--surface3); border: 1px solid var(--border);
+    color: var(--text); border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700;
+    padding: 8px 10px; text-transform: uppercase;
+  }
+  .tpl-ex-controls { display: flex; gap: 4px; }
+  .tpl-ex-btn {
+    width: 30px; height: 30px; border-radius: 6px;
+    background: var(--surface3); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tpl-ex-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .tpl-ex-btn.delete { color: var(--red); }
+
+  .tpl-ex-row {
+    display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap;
+  }
+  .tpl-ex-field { display: flex; flex-direction: column; gap: 3px; }
+  .tpl-ex-field-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+  .tpl-ex-num {
+    background: var(--surface3); border: 1px solid var(--border);
+    color: var(--text); border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700;
+    padding: 6px 8px; width: 60px; text-align: center; -webkit-appearance: none;
+  }
+  .tpl-ex-text {
+    background: var(--surface3); border: 1px solid var(--border);
+    color: var(--text); border-radius: 6px;
+    font-family: 'Barlow', sans-serif; font-size: 13px;
+    padding: 6px 8px; flex: 1; min-width: 120px;
+  }
+  .tpl-add-ex-btn {
+    width: 100%; padding: 12px; margin-top: 8px;
+    background: none; border: 1px dashed var(--border);
+    border-radius: 10px; color: var(--accent);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer;
+  }
+  .tpl-danger {
+    background: rgba(255,74,74,0.08); border: 1px solid rgba(255,74,74,0.2);
+    color: var(--red); border-radius: 8px; padding: 10px 14px;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    cursor: pointer; width: 100%; margin-top: 12px;
+  }
+
   /* SCHEDULE MODAL */
   .schedule-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 6px; margin-bottom: 16px; }
   .sched-day {
@@ -643,6 +756,7 @@
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
         <div id="home-streak-badge" class="badge"></div>
         <button onclick="openScheduleModal()" style="background:none;border:none;color:var(--text-muted);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Barlow Condensed',sans-serif;">⚙ Schedule</button>
+        <button onclick="openTemplateModal()" style="background:none;border:none;color:var(--text-muted);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Barlow Condensed',sans-serif;">✎ Templates</button>
       </div>
     </div>
 
@@ -835,6 +949,33 @@
   </div>
 </div>
 
+<!-- TEMPLATE EDITOR MODAL -->
+<div class="modal-overlay" id="template-modal">
+  <div class="modal-sheet" style="max-height:92dvh">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Workout Templates</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px">Edit your workouts. Changes apply to all future sessions.</div>
+    <div class="tpl-tabs" id="tpl-tabs"></div>
+    <div id="tpl-editor"></div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn-primary" onclick="saveTemplates()" style="flex:1">Save</button>
+      <button class="btn-secondary" onclick="closeTemplateModal()" style="flex:1">Cancel</button>
+    </div>
+    <button class="tpl-danger" onclick="resetTemplates()">↻ Reset to Defaults</button>
+  </div>
+</div>
+
+<!-- EXERCISE PICKER MODAL -->
+<div class="modal-overlay" id="picker-modal">
+  <div class="modal-sheet" style="max-height:90dvh">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Pick Exercise</div>
+    <input class="picker-search" id="picker-search" placeholder="Search exercises..." oninput="renderPicker(this.value)">
+    <div id="picker-list" style="margin-bottom:12px"></div>
+    <button class="btn-secondary" style="width:100%" onclick="closePickerModal()">Cancel</button>
+  </div>
+</div>
+
 <!-- SWAP EXERCISE MODAL -->
 <div class="modal-overlay" id="swap-modal">
   <div class="modal-sheet">
@@ -906,6 +1047,11 @@ const SUBSTITUTES = {
     { id:"cablerow", name:"Cable Row",           notes:"Neutral grip, pull to lower chest, squeeze" },
     { id:"machrow",  name:"Machine Row",         notes:"Chest pad, pull handles to sides" },
   ],
+  pulldown: [
+    { id:"pulldown",  name:"Lat Pulldown",        notes:"Wide grip, pull to upper chest, lean back slightly" },
+    { id:"pullup",    name:"Pull-ups",            notes:"Bodyweight — assisted if needed, full hang at bottom" },
+    { id:"machpd",    name:"Machine Pulldown",    notes:"Set seat so arms reach full extension at top" },
+  ],
   ohp: [
     { id:"ohp",      name:"Overhead Press",      notes:"Bar path straight up, squeeze glutes" },
     { id:"dbohp",    name:"DB Shoulder Press",   notes:"Dumbbells at ear level, press straight up" },
@@ -942,18 +1088,161 @@ function getSubDef(primaryId, varId) {
   return subs.find(s=>s.id===varId) || subs[0];
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// EXERCISE LIBRARY — categorized for the template editor
+// Each entry: id, name, category, sets, reps, muscle, notes
+// ─────────────────────────────────────────────────────────────────────────────
+const EXERCISE_LIBRARY = {
+  "Push (Horizontal)": [
+    { id:"bench",    name:"Bench Press",         sets:3, reps:5,  muscle:"Chest", notes:"Touch chest, full lockout" },
+    { id:"dbbench",  name:"Dumbbell Press",      sets:3, reps:8,  muscle:"Chest", notes:"Neutral or pronated grip, controlled descent" },
+    { id:"incdb",    name:"Incline DB Press",    sets:3, reps:8,  muscle:"Chest", notes:"Bench at 30-45° incline" },
+    { id:"machpress",name:"Machine Chest Press", sets:3, reps:10, muscle:"Chest", notes:"Set seat so handles align with mid-chest" },
+    { id:"pushup",   name:"Push-ups",            sets:3, reps:10, muscle:"Chest", notes:"Body straight, full range" },
+  ],
+  "Push (Vertical)": [
+    { id:"ohp",      name:"Overhead Press",      sets:3, reps:5,  muscle:"Shoulders", notes:"Bar path straight up, squeeze glutes" },
+    { id:"dbohp",    name:"DB Shoulder Press",   sets:3, reps:8,  muscle:"Shoulders", notes:"Dumbbells at ear level, press straight up" },
+    { id:"machohp",  name:"Machine Shoulder Press", sets:3, reps:10, muscle:"Shoulders", notes:"Seat handles at shoulder height" },
+    { id:"lateral",  name:"Lateral Raise",       sets:3, reps:12, muscle:"Shoulders", notes:"Light weight, slight elbow bend, raise to parallel" },
+  ],
+  "Pull (Horizontal)": [
+    { id:"row",      name:"Dumbbell Row",        sets:3, reps:8,  muscle:"Back",  notes:"Brace on bench, pull elbow to hip — each side" },
+    { id:"cablerow", name:"Cable Row",           sets:3, reps:10, muscle:"Back",  notes:"Neutral grip, pull to lower chest, squeeze" },
+    { id:"machrow",  name:"Machine Row",         sets:3, reps:10, muscle:"Back",  notes:"Chest pad, pull handles to sides" },
+    { id:"facepull", name:"Face Pull",           sets:3, reps:12, muscle:"Back",  notes:"Cable to face level, elbows high" },
+  ],
+  "Pull (Vertical)": [
+    { id:"pulldown", name:"Lat Pulldown",        sets:3, reps:10, muscle:"Back",  notes:"Wide grip, pull to upper chest, lean back slightly" },
+    { id:"pullup",   name:"Pull-ups",            sets:3, reps:8,  muscle:"Back",  notes:"Bodyweight — assisted if needed, full hang at bottom" },
+    { id:"machpd",   name:"Machine Pulldown",    sets:3, reps:10, muscle:"Back",  notes:"Set seat so arms reach full extension at top" },
+  ],
+  "Squat (Legs)": [
+    { id:"squat",    name:"Back Squat",          sets:3, reps:5,  muscle:"Legs",  notes:"Drive knees out, chest up" },
+    { id:"frontsq",  name:"Front Squat",         sets:3, reps:5,  muscle:"Legs",  notes:"Elbows up, upright torso" },
+    { id:"legpress", name:"Leg Press",           sets:3, reps:8,  muscle:"Legs",  notes:"Feet shoulder-width, full range — don't lock knees" },
+    { id:"goblet",   name:"Goblet Squat",        sets:3, reps:8,  muscle:"Legs",  notes:"Dumbbell at chest, elbows inside knees" },
+    { id:"hacksquat",name:"Hack Squat",          sets:3, reps:8,  muscle:"Legs",  notes:"Machine — same depth cues as barbell squat" },
+    { id:"bulgsplit",name:"Bulgarian Split Squat",sets:3, reps:8, muscle:"Legs",  notes:"Rear foot elevated, drop straight down" },
+    { id:"legext",   name:"Leg Extension",       sets:3, reps:12, muscle:"Quads", notes:"Slow controlled, squeeze at top" },
+  ],
+  "Hinge (Legs/Back)": [
+    { id:"dl",       name:"Deadlift",            sets:1, reps:5,  muscle:"Back/Legs", notes:"Single working set — it's enough" },
+    { id:"rdl",      name:"Romanian Deadlift",   sets:3, reps:8,  muscle:"Hamstrings", notes:"Soft knee, hinge at hips, bar stays close" },
+    { id:"trapbar",  name:"Trap Bar Deadlift",   sets:3, reps:5,  muscle:"Back/Legs", notes:"Neutral grip, stand tall at top" },
+    { id:"hipthrust",name:"Hip Thrust",          sets:3, reps:10, muscle:"Glutes", notes:"Upper back on bench, drive hips to ceiling" },
+    { id:"legcurl",  name:"Leg Curl",            sets:3, reps:12, muscle:"Hamstrings", notes:"Slow eccentric, squeeze at top" },
+  ],
+  "Arms": [
+    { id:"curl",     name:"Dumbbell Curl",       sets:3, reps:10, muscle:"Biceps", notes:"Full range, no swinging — slow on the way down" },
+    { id:"barcurl",  name:"Barbell Curl",        sets:3, reps:10, muscle:"Biceps", notes:"Elbows pinned to sides, squeeze at top" },
+    { id:"hamcurl",  name:"Hammer Curl",         sets:3, reps:10, muscle:"Biceps", notes:"Neutral grip, great for brachialis" },
+    { id:"tric",     name:"Tricep Pushdown",     sets:3, reps:12, muscle:"Triceps", notes:"Elbows pinned to sides, full extension" },
+    { id:"skullcrusher",name:"Skull Crusher",    sets:3, reps:10, muscle:"Triceps", notes:"Bar to forehead, elbows straight up" },
+    { id:"dbtric",   name:"DB Tricep Extension", sets:3, reps:10, muscle:"Triceps", notes:"One dumbbell overhead, lower behind head" },
+  ],
+  "Core": [
+    { id:"plank",    name:"Plank",               sets:3, reps:1,  muscle:"Core", notes:"Hold 30-60 sec, body straight" },
+    { id:"hangleg",  name:"Hanging Leg Raise",   sets:3, reps:10, muscle:"Core", notes:"No swinging, controlled raise to 90°" },
+    { id:"cablecrunch",name:"Cable Crunch",      sets:3, reps:12, muscle:"Core", notes:"Round spine, squeeze abs at bottom" },
+  ],
+};
+
+// Map exercise id → category, for balance analysis
+function getExerciseCategory(exId) {
+  for(const [cat, exes] of Object.entries(EXERCISE_LIBRARY)) {
+    if(exes.some(e => e.id === exId)) return cat;
+  }
+  return null;
+}
+
+function findExerciseDef(exId) {
+  for(const exes of Object.values(EXERCISE_LIBRARY)) {
+    const found = exes.find(e => e.id === exId);
+    if(found) return found;
+  }
+  return null;
+}
+
+// Analyze a single workout's balance
+function analyzeWorkout(workout) {
+  const counts = {};
+  workout.exercises.forEach(ex => {
+    const cat = getExerciseCategory(ex.id) || 'Other';
+    counts[cat] = (counts[cat]||0) + 1;
+  });
+
+  const issues = [];
+  const exCount = workout.exercises.length;
+
+  if(exCount === 0) return { counts, issues: [{type:'error', msg:'No exercises in this workout.'}] };
+
+  const push = (counts['Push (Horizontal)']||0) + (counts['Push (Vertical)']||0);
+  const pull = (counts['Pull (Horizontal)']||0) + (counts['Pull (Vertical)']||0);
+  const legs = (counts['Squat (Legs)']||0) + (counts['Hinge (Legs/Back)']||0);
+
+  // No legs at all
+  if(legs === 0 && exCount >= 2) {
+    issues.push({type:'warn', msg:'No leg exercises. Consider adding a squat or hinge movement.'});
+  }
+  // Push without pull
+  if(push >= 2 && pull === 0) {
+    issues.push({type:'warn', msg:`${push} pushing exercises with no pulling — add a row or pulldown for balance.`});
+  }
+  // Pull without push
+  if(pull >= 2 && push === 0) {
+    issues.push({type:'warn', msg:`${pull} pulling exercises with no pushing — add a press for balance.`});
+  }
+  // Heavy push:pull imbalance
+  if(push > 0 && pull > 0 && Math.abs(push - pull) >= 2) {
+    issues.push({type:'info', msg:`Push:Pull is ${push}:${pull} — works for some sessions, but balance across the week.`});
+  }
+  // Too many exercises
+  if(exCount >= 7) {
+    issues.push({type:'info', msg:`${exCount} exercises is a long session — expect 45+ minutes.`});
+  }
+  // Only accessories, no compounds
+  const compounds = (counts['Squat (Legs)']||0) + (counts['Hinge (Legs/Back)']||0) +
+                    (counts['Push (Horizontal)']||0) + (counts['Push (Vertical)']||0) +
+                    (counts['Pull (Horizontal)']||0) + (counts['Pull (Vertical)']||0);
+  const accessories = (counts['Arms']||0) + (counts['Core']||0);
+  if(compounds === 0 && accessories > 0) {
+    issues.push({type:'warn', msg:'No main compound lifts — add at least one squat, hinge, press, or pull.'});
+  }
+  if(compounds > 0 && accessories > compounds * 2) {
+    issues.push({type:'info', msg:'Heavy on accessories vs. main lifts. Prioritize compounds.'});
+  }
+
+  if(issues.length === 0) {
+    issues.push({type:'good', msg:'Balanced workout — push, pull, and legs covered.'});
+  }
+
+  return { counts, issues };
+}
+
 function loadData() {
   const defaults = {
     sessions: [],
     prs: {},
     bodyWeight: [],
     lastWorkoutIndex: -1,
-    schedule: { 1: 'A', 3: 'B', 5: 'A' } // dow -> workout id
+    schedule: { 1: 'A', 3: 'B', 5: 'A' }, // dow -> workout id
+    workouts: null // null means use BEGINNER_PROGRAM defaults
   };
   const saved = JSON.parse(localStorage.getItem('ironData') || 'null');
   if(!saved) return defaults;
   if(!saved.schedule) saved.schedule = defaults.schedule;
+  if(saved.workouts === undefined) saved.workouts = null;
   return saved;
+}
+
+// Source of truth for current workout templates
+function getWorkouts() {
+  return (appData.workouts && appData.workouts.length) ? appData.workouts : BEGINNER_PROGRAM.workouts;
+}
+
+function getWorkoutById(id) {
+  return getWorkouts().find(w => w.id === id);
 }
 function saveData(d) { localStorage.setItem('ironData', JSON.stringify(d)); }
 
@@ -970,6 +1259,237 @@ function switchScreen(id) {
   if(id==='home') renderHome();
   if(id==='history') renderHistory();
   if(id==='progress') renderProgress();
+}
+
+// ════════════════════════════════════════════════
+// TEMPLATE EDITOR
+// ════════════════════════════════════════════════
+let tempWorkouts = null;
+let activeTplIdx = 0;
+
+function openTemplateModal() {
+  // Deep clone current workouts to a working copy
+  tempWorkouts = JSON.parse(JSON.stringify(getWorkouts()));
+  activeTplIdx = 0;
+  renderTemplateModal();
+  document.getElementById('template-modal').classList.add('show');
+}
+
+function closeTemplateModal() {
+  document.getElementById('template-modal').classList.remove('show');
+}
+
+function renderTemplateModal() {
+  // Tabs
+  const tabs = document.getElementById('tpl-tabs');
+  tabs.innerHTML = tempWorkouts.map((w, i) =>
+    `<div class="tpl-tab ${i===activeTplIdx?'active':''}" onclick="switchTplTab(${i})">${w.name || w.id}</div>`
+  ).join('') + `<div class="tpl-tab tpl-tab-add" onclick="addTemplate()">+ New</div>`;
+
+  const wk = tempWorkouts[activeTplIdx];
+  if(!wk) { document.getElementById('tpl-editor').innerHTML = ''; return; }
+
+  // Run balance analysis
+  const analysis = analyzeWorkout(wk);
+  const analysisHtml = analysis.issues.map(iss => {
+    const icons = { good: '✓', warn: '⚠️', info: 'ⓘ', error: '✗' };
+    return `<div class="analysis-box ${iss.type}">
+      <div class="analysis-icon">${icons[iss.type]||'ⓘ'}</div>
+      <div>${iss.msg}</div>
+    </div>`;
+  }).join('');
+
+  const exHtml = wk.exercises.map((ex, ei) => {
+    const cat = getExerciseCategory(ex.id);
+    const catLabel = cat ? `<span style="font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-left:6px">${cat}</span>` : '';
+    return `
+    <div class="tpl-exercise">
+      <div class="tpl-ex-header">
+        <div style="flex:1">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;text-transform:uppercase">${ex.name||'(unnamed)'}${catLabel}</div>
+        </div>
+        <div class="tpl-ex-controls">
+          <button class="tpl-ex-btn" onclick="moveExercise(${ei},-1)" ${ei===0?'disabled':''}>↑</button>
+          <button class="tpl-ex-btn" onclick="moveExercise(${ei},1)" ${ei===wk.exercises.length-1?'disabled':''}>↓</button>
+          <button class="tpl-ex-btn delete" onclick="deleteExercise(${ei})">×</button>
+        </div>
+      </div>
+      <div class="tpl-ex-row">
+        <div class="tpl-ex-field">
+          <div class="tpl-ex-field-lbl">Sets</div>
+          <input class="tpl-ex-num" type="number" inputmode="numeric" value="${ex.sets||3}" oninput="updateExField(${ei},'sets',parseInt(this.value)||0)">
+        </div>
+        <div class="tpl-ex-field">
+          <div class="tpl-ex-field-lbl">Reps</div>
+          <input class="tpl-ex-num" type="number" inputmode="numeric" value="${ex.reps||5}" oninput="updateExField(${ei},'reps',parseInt(this.value)||0)">
+        </div>
+      </div>
+    </div>
+  `;
+  }).join('');
+
+  document.getElementById('tpl-editor').innerHTML = `
+    <input class="tpl-name-input" value="${wk.name||''}" placeholder="Workout name" oninput="updateWorkoutField('name',this.value)">
+    ${analysisHtml}
+    ${exHtml}
+    <button class="tpl-add-ex-btn" onclick="openPickerModal()">+ Add Exercise</button>
+    ${tempWorkouts.length > 1 ? `<button class="tpl-danger" onclick="deleteTemplate()" style="margin-top:8px">Delete This Workout</button>` : ''}
+  `;
+}
+
+function switchTplTab(idx) {
+  activeTplIdx = idx;
+  renderTemplateModal();
+}
+
+function updateWorkoutField(field, val) {
+  tempWorkouts[activeTplIdx][field] = val;
+  // Don't re-render — would lose focus on input
+}
+
+function updateExField(exIdx, field, val) {
+  tempWorkouts[activeTplIdx].exercises[exIdx][field] = val;
+  // Don't re-render — would lose focus
+}
+
+function generateExerciseId(name) {
+  // Try to match to existing substitute first
+  const lower = name.toLowerCase().trim();
+  for(const [primary, subs] of Object.entries(SUBSTITUTES)) {
+    for(const s of subs) {
+      if(s.name.toLowerCase() === lower) return s.id;
+    }
+  }
+  // Otherwise slugify
+  return lower.replace(/[^a-z0-9]/g,'').slice(0,12) || 'ex' + Date.now();
+}
+
+function openPickerModal() {
+  document.getElementById('picker-search').value = '';
+  renderPicker('');
+  document.getElementById('picker-modal').classList.add('show');
+}
+
+function closePickerModal() {
+  document.getElementById('picker-modal').classList.remove('show');
+}
+
+function renderPicker(searchText) {
+  const search = (searchText||'').toLowerCase().trim();
+  const list = document.getElementById('picker-list');
+  let html = '';
+
+  for(const [category, exercises] of Object.entries(EXERCISE_LIBRARY)) {
+    const filtered = exercises.filter(ex =>
+      !search || ex.name.toLowerCase().includes(search) ||
+      (ex.muscle||'').toLowerCase().includes(search) ||
+      category.toLowerCase().includes(search)
+    );
+    if(filtered.length === 0) continue;
+
+    html += `<div class="picker-cat-header">${category}</div>`;
+    html += filtered.map(ex => `
+      <div class="picker-option" onclick="addExerciseFromLibrary('${ex.id}')">
+        <div class="picker-opt-name">${ex.name}</div>
+        <div class="picker-opt-meta">${ex.sets}×${ex.reps} · ${ex.muscle}</div>
+      </div>
+    `).join('');
+  }
+
+  if(!html) {
+    html = `<div style="text-align:center;padding:30px 0;color:var(--text-muted);font-size:14px">No exercises match "${searchText}"</div>`;
+  }
+  list.innerHTML = html;
+}
+
+function addExerciseFromLibrary(exId) {
+  const def = findExerciseDef(exId);
+  if(!def) return;
+  tempWorkouts[activeTplIdx].exercises.push({
+    id: def.id,
+    name: def.name,
+    sets: def.sets,
+    reps: def.reps,
+    muscle: def.muscle,
+    notes: def.notes
+  });
+  closePickerModal();
+  renderTemplateModal();
+}
+
+// Legacy alias — kept in case anything still calls it
+function addExerciseToTemplate() { openPickerModal(); }
+
+function moveExercise(idx, dir) {
+  const arr = tempWorkouts[activeTplIdx].exercises;
+  const newIdx = idx + dir;
+  if(newIdx < 0 || newIdx >= arr.length) return;
+  [arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]];
+  renderTemplateModal();
+}
+
+function deleteExercise(idx) {
+  if(!confirm('Delete this exercise from the template?')) return;
+  tempWorkouts[activeTplIdx].exercises.splice(idx, 1);
+  renderTemplateModal();
+}
+
+function addTemplate() {
+  // Find next available letter ID
+  const usedIds = tempWorkouts.map(w => w.id);
+  const letters = ['A','B','C','D','E','F','G','H'];
+  const newId = letters.find(l => !usedIds.includes(l)) || ('W' + Date.now());
+  tempWorkouts.push({
+    id: newId,
+    name: 'Workout ' + newId,
+    exercises: []
+  });
+  activeTplIdx = tempWorkouts.length - 1;
+  renderTemplateModal();
+}
+
+function deleteTemplate() {
+  if(tempWorkouts.length <= 1) { alert('You need at least one workout template.'); return; }
+  if(!confirm('Delete this entire workout template?')) return;
+  tempWorkouts.splice(activeTplIdx, 1);
+  activeTplIdx = Math.min(activeTplIdx, tempWorkouts.length - 1);
+  renderTemplateModal();
+}
+
+function saveTemplates() {
+  // Regenerate IDs from names for new exercises so substitutes/PRs match up
+  tempWorkouts.forEach(w => {
+    w.exercises.forEach(ex => {
+      if(ex.id && ex.id.startsWith('new')) {
+        ex.id = generateExerciseId(ex.name);
+      }
+    });
+  });
+
+  // Validate at least one workout has at least one exercise
+  if(tempWorkouts.some(w => w.exercises.length === 0)) {
+    if(!confirm('One or more workouts have no exercises. Save anyway?')) return;
+  }
+
+  appData.workouts = tempWorkouts;
+
+  // Clean up schedule entries pointing to deleted workouts
+  const validIds = new Set(tempWorkouts.map(w => w.id));
+  Object.keys(appData.schedule || {}).forEach(dow => {
+    if(!validIds.has(appData.schedule[dow])) delete appData.schedule[dow];
+  });
+
+  saveData(appData);
+  closeTemplateModal();
+  renderHome();
+}
+
+function resetTemplates() {
+  if(!confirm('Reset all templates to the default Starting Strength program? Your session history will not be affected.')) return;
+  appData.workouts = null;
+  saveData(appData);
+  closeTemplateModal();
+  renderHome();
 }
 
 // ════════════════════════════════════════════════
@@ -1006,7 +1526,7 @@ function renderScheduleModal() {
   }
   const dayNamesLong = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   assignList.innerHTML = activeDays.map(dow => {
-    const opts = BEGINNER_PROGRAM.workouts.map(w =>
+    const opts = getWorkouts().map(w =>
       `<option value="${w.id}" ${tempSchedule[dow]===w.id?'selected':''}>${w.name}</option>`
     ).join('');
     return `<div class="assign-row">
@@ -1022,9 +1542,9 @@ function toggleSchedDay(dow) {
   } else {
     // auto-assign next workout in sequence
     const assigned = Object.values(tempSchedule);
-    const lastIdx = assigned.length ? BEGINNER_PROGRAM.workouts.findIndex(w=>w.id===assigned[assigned.length-1]) : -1;
-    const nextIdx = (lastIdx + 1) % BEGINNER_PROGRAM.workouts.length;
-    tempSchedule[dow] = BEGINNER_PROGRAM.workouts[nextIdx].id;
+    const lastIdx = assigned.length ? getWorkouts().findIndex(w=>w.id===assigned[assigned.length-1]) : -1;
+    const nextIdx = (lastIdx + 1) % getWorkouts().length;
+    tempSchedule[dow] = getWorkouts()[nextIdx].id;
   }
   renderScheduleModal();
 }
@@ -1129,7 +1649,7 @@ function renderHome() {
   // Get workout for this specific day from schedule, or fall back to sequence
   const scheduledWorkoutId = appData.schedule && appData.schedule[viewDow];
   const scheduledWorkout = scheduledWorkoutId
-    ? BEGINNER_PROGRAM.workouts.find(w=>w.id===scheduledWorkoutId) || getNextWorkout()
+    ? getWorkouts().find(w=>w.id===scheduledWorkoutId) || getNextWorkout()
     : getNextWorkout();
   const nextWorkout = scheduledWorkout;
 
@@ -1197,8 +1717,9 @@ function renderHome() {
 }
 
 function getNextWorkout() {
-  const idx = (appData.lastWorkoutIndex + 1) % BEGINNER_PROGRAM.workouts.length;
-  return BEGINNER_PROGRAM.workouts[idx];
+  const wks = getWorkouts();
+  const idx = (appData.lastWorkoutIndex + 1) % wks.length;
+  return wks[idx];
 }
 
 function getNextWorkoutDayName() {
@@ -1642,7 +2163,7 @@ function finishWorkout() {
   session.volume = vol;
 
   appData.sessions.push(session);
-  appData.lastWorkoutIndex = BEGINNER_PROGRAM.workouts.findIndex(w=>w.id===activeWorkout.id);
+  appData.lastWorkoutIndex = getWorkouts().findIndex(w=>w.id===activeWorkout.id);
   saveData(appData);
 
   clearInterval(timerInterval);

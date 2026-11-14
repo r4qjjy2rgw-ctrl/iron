@@ -746,6 +746,14 @@
      and the unfolded inner screen is >600px wide, so neither matches.
      Force on/off for testing with ?cover=1 / ?cover=0 (remembered). */
   .thumb-rail { display: none; }
+  .layout-toggle { display: flex; gap: 6px; }
+  .layout-toggle button {
+    flex: 1; padding: 12px 0; border-radius: 10px;
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim);
+    font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  }
+  .layout-toggle button.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
 
   body.cover-mode .bottom-nav {
     top: 0; bottom: 0; left: auto; right: 0;
@@ -897,6 +905,16 @@
           <button class="weight-log-btn" onclick="logBodyWeight()">LOG</button>
         </div>
         <div class="weight-history" id="weight-history-list"></div>
+      </div>
+
+      <div class="weight-log-section">
+        <div class="section-label" style="margin-bottom:10px">Thumb Layout (Duo cover)</div>
+        <div class="layout-toggle" id="layout-toggle">
+          <button onclick="setCoverOverride(null)" data-v="auto">Auto</button>
+          <button onclick="setCoverOverride('1')" data-v="1">On</button>
+          <button onclick="setCoverOverride('0')" data-v="0">Off</button>
+        </div>
+        <div id="layout-info" style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:8px"></div>
       </div>
     </div>
   </div>
@@ -2079,6 +2097,8 @@ function railStepExercise(dir) {
   if (idx >= 0 && idx < activeWorkout.exercises.length) switchExercise(idx);
 }
 
+const IRON_BUILD = '2026-11-14b';
+
 (function initCoverMode() {
   try {
     const p = new URLSearchParams(location.search).get('cover');
@@ -2090,6 +2110,16 @@ function railStepExercise(dir) {
     try { o = localStorage.getItem('iron_cover_override'); } catch (e) {}
     const on = o === '1' ? true : o === '0' ? false : mq.matches;
     document.body.classList.toggle('cover-mode', on);
+    const cur = o === '1' || o === '0' ? o : 'auto';
+    document.querySelectorAll('#layout-toggle button').forEach(b =>
+      b.classList.toggle('active', b.dataset.v === cur));
+    const info = document.getElementById('layout-info');
+    if (info) info.textContent =
+      `Screen ${window.innerWidth}×${window.innerHeight} · auto-detect: ${mq.matches ? 'cover' : 'not cover'} · build ${IRON_BUILD}`;
+  };
+  window.setCoverOverride = (v) => {
+    try { v === null ? localStorage.removeItem('iron_cover_override') : localStorage.setItem('iron_cover_override', v); } catch (e) {}
+    apply();
   };
   apply();
   mq.addEventListener ? mq.addEventListener('change', apply) : mq.addListener(apply);

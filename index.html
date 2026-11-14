@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IRON">
@@ -40,7 +40,10 @@
   }
 
   /* LAYOUT */
-  #app { display: flex; flex-direction: column; min-height: 100dvh; }
+  #app { display: flex; flex-direction: column; min-height: 100dvh;
+    padding-top: env(safe-area-inset-top, 0px); padding-left: env(safe-area-inset-left, 0px); }
+  #workout-active { padding-top: env(safe-area-inset-top, 0px); padding-left: env(safe-area-inset-left, 0px); }
+  body:not(.cover-mode) .screen, body:not(.cover-mode) #workout-active { padding-right: env(safe-area-inset-right, 0px); }
 
   .screen { display: none; flex-direction: column; flex: 1; padding-bottom: calc(72px + var(--safe)); }
   .screen.active { display: flex; }
@@ -763,9 +766,10 @@
     padding: 0 env(safe-area-inset-right, 0px) calc(12px + var(--safe)) 0;
   }
   body.cover-mode .nav-btn { flex: 0 0 auto; padding: 16px 4px; }
-  body.cover-mode .screen { padding-bottom: calc(16px + var(--safe)); padding-right: 68px; }
+  body.cover-mode .screen { padding-bottom: calc(16px + var(--safe)); padding-right: calc(68px + env(safe-area-inset-right, 0px)); }
+  body.cover-mode .week-day { flex: 1 1 0; width: auto; min-width: 0; }
 
-  body.cover-mode #workout-active { padding-right: 76px; }
+  body.cover-mode #workout-active { padding-right: calc(76px + env(safe-area-inset-right, 0px)); }
   body.cover-mode .thumb-rail {
     display: flex; flex-direction: column; justify-content: flex-end; gap: 10px;
     position: fixed; top: 0; bottom: 0; right: 0;
@@ -2097,7 +2101,7 @@ function railStepExercise(dir) {
   if (idx >= 0 && idx < activeWorkout.exercises.length) switchExercise(idx);
 }
 
-const IRON_BUILD = '2026-11-14b';
+const IRON_BUILD = '2026-11-14c';
 
 (function initCoverMode() {
   try {

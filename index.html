@@ -2101,14 +2101,14 @@ function railStepExercise(dir) {
   if (idx >= 0 && idx < activeWorkout.exercises.length) switchExercise(idx);
 }
 
-const IRON_BUILD = '2026-11-14c';
+const IRON_BUILD = '2026-11-14d';
 
 (function initCoverMode() {
   try {
     const p = new URLSearchParams(location.search).get('cover');
     if (p === '1' || p === '0') localStorage.setItem('iron_cover_override', p);
   } catch (e) {}
-  const mq = window.matchMedia('(max-width: 520px) and (min-aspect-ratio: 3/5)');
+  const mq = window.matchMedia('(max-width: 520px) and (max-height: 700px) and (min-aspect-ratio: 1/2)');
   const apply = () => {
     let o = null;
     try { o = localStorage.getItem('iron_cover_override'); } catch (e) {}
